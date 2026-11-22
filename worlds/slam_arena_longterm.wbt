@@ -1,0 +1,43 @@
+#VRML_SIM R2023b utf8
+# Long-term Multi-session SLAM World
+WorldInfo {
+  basicTimeStep 16
+  coordinateSystem "NUE"
+}
+Viewpoint { orientation -0.6 0.5 0.2 1.5 position 5.0 6.0 8.0 }
+TexturedBackground {}
+Fog { visibilityRange 30.0 color 0.8 0.8 0.8 }
+DirectionalLight { direction 0.5 -1.0 -0.5 intensity 0.8 castShadows TRUE }
+TexturedBackgroundLight {}
+Floor { size 30 30 tileSize 1 }
+
+# Same environment but robot starts at different position (session 2)
+Solid { translation 4 0.5 4 children [ Shape { geometry Cylinder { height 1 radius 0.5 } appearance PBRAppearance { baseColor 0.8 0.2 0.2 } } ] recognition Recognition { } }
+Solid { translation -4 0.5 -4 children [ Shape { geometry Box { size 1 1 1 } appearance PBRAppearance { baseColor 0.2 0.8 0.2 } } ] recognition Recognition { } }
+Solid { translation 5 0.5 -3 children [ Shape { geometry Sphere { radius 0.6 } appearance PBRAppearance { baseColor 0.2 0.2 0.8 } } ] recognition Recognition { } }
+Solid DEF PEDESTRIAN { translation 5 0.75 0 children [ Shape { geometry Cylinder { height 1.5 radius 0.3 } appearance PBRAppearance { baseColor 0.8 0.2 0.5 } } ] boundingObject Shape { geometry Cylinder { height 1.5 radius 0.3 } } physics Physics {} }
+Solid { translation 0 0.5 10 children [ Shape { geometry Box { size 20 1 0.2 } } ] }
+Solid { translation 0 0.5 -10 children [ Shape { geometry Box { size 20 1 0.2 } } ] }
+Solid { translation 10 0.5 0 children [ Shape { geometry Box { size 0.2 1 20 } } ] }
+Solid { translation -10 0.5 0 children [ Shape { geometry Box { size 0.2 1 20 } } ] }
+
+# Robot starts at different pose for session 2
+Robot {
+  supervisor TRUE
+  translation 3 0.2 3
+  rotation 0 0 1 1.57
+  controller "slam_longterm_controller"
+  name "slam_robot"
+  customData "robot_id:1;session:2"
+  children [
+    Shape { geometry Cylinder { height 0.3 radius 0.3 } appearance PBRAppearance { baseColor 0.1 0.8 0.8 } }
+    Lidar { translation 0 0.25 0 name "lidar" numberOfLayers 16 horizontalResolution 1800 maxRange 30.0 noise 0.02 enabled TRUE }
+    InertialUnit { name "imu" noise 0.01 enabled TRUE }
+    Camera { name "camera" width 640 height 480 fieldOfView 1.04 enabled TRUE }
+    Recognition { name "recognition" enabled TRUE }
+    Gps { name "gps" enabled TRUE }
+    HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor 0.25 0 0 } device [ RotationalMotor { name "left_wheel" } PositionSensor { name "left_sensor" } ] endPoint Solid { translation 0.25 0 0 children [ Shape { geometry Cylinder { height 0.05 radius 0.1 } } ] boundingObject Shape { geometry Cylinder { height 0.05 radius 0.1 } } } }
+    HingeJoint { jointParameters HingeJointParameters { axis 0 1 0 anchor -0.25 0 0 } device [ RotationalMotor { name "right_wheel" } PositionSensor { name "right_sensor" } ] endPoint Solid { translation -0.25 0 0 children [ Shape { geometry Cylinder { height 0.05 radius 0.1 } } ] boundingObject Shape { geometry Cylinder { height 0.05 radius 0.1 } } } }
+  ]
+  boundingObject Shape { geometry Cylinder { height 0.3 radius 0.3 } }
+}

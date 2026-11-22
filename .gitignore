@@ -1,0 +1,79 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# Webots
+*.wbproj
+*.wbt~
+temp/
+
+# Data and Results
+datasets/
+results/
+*.npy
+*.pcd
+*.csv
+*.jsonl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker/*.log
+
+# Added by Git Repo Creator
+# Media, archives, and AI models
+*.7z
+*.aac
+*.avi
+*.blend
+*.flac
+*.flv
+*.gz
+*.iso
+*.jpeg
+*.jpg
+*.m4a
+*.mkv
+*.mov
+*.mp3
+*.mp4
+*.ogg
+*.png
+*.rar
+*.tar
+*.wav
+*.webm
+*.wmv
+*.zip
+# Python / dev junk
+.env
+.env.local
+*.tmp
+*.bak
+# Cleanup dirs kept on disk but ignored
+.pytest_cache/
+.venv/
+build/
+dist/
+model_cache/
+models/
+node_modules/
+# GitHub Actions
+.github/

@@ -1,0 +1,125 @@
+#VRML_SIM R2023b utf8
+# Novel SLAM Research Arena - Main World
+WorldInfo {
+  basicTimeStep 16
+  coordinateSystem "NUE"
+}
+Viewpoint {
+  orientation -0.6 0.5 0.2 1.5
+  position 5.0 6.0 8.0
+}
+TexturedBackground {}
+
+# Environmental effects (adjustable for robustness testing)
+Fog { visibilityRange 30.0 color 0.8 0.8 0.8 }
+DirectionalLight { direction 0.5 -1.0 -0.5 intensity 0.8 castShadows TRUE }
+TexturedBackgroundLight {}
+Floor { size 30 30 tileSize 1 }
+
+# Semantic objects with recognition
+Solid DEF RED_CYLINDER {
+  translation 4 0.5 4
+  children [
+    Shape {
+      geometry Cylinder { height 1 radius 0.5 }
+      appearance PBRAppearance { baseColor 0.8 0.2 0.2 }
+    }
+  ]
+  recognition Recognition { }
+}
+Solid DEF GREEN_BOX {
+  translation -4 0.5 -4
+  children [
+    Shape {
+      geometry Box { size 1 1 1 }
+      appearance PBRAppearance { baseColor 0.2 0.8 0.2 }
+    }
+  ]
+  recognition Recognition { }
+}
+Solid DEF BLUE_SPHERE {
+  translation 5 0.5 -3
+  children [
+    Shape {
+      geometry Sphere { radius 0.6 }
+      appearance PBRAppearance { baseColor 0.2 0.2 0.8 }
+    }
+  ]
+  recognition Recognition { }
+}
+
+# Dynamic obstacle (pedestrian)
+Solid DEF PEDESTRIAN {
+  translation 5 0.75 0
+  children [
+    Shape {
+      geometry Cylinder { height 1.5 radius 0.3 }
+      appearance PBRAppearance { baseColor 0.8 0.2 0.5 }
+    }
+  ]
+  boundingObject Shape { geometry Cylinder { height 1.5 radius 0.3 } }
+  physics Physics {}
+}
+
+# Outer walls
+Solid { translation 0 0.5 10 children [ Shape { geometry Box { size 20 1 0.2 } appearance PBRAppearance { baseColor 0.6 0.6 0.6 } } ] }
+Solid { translation 0 0.5 -10 children [ Shape { geometry Box { size 20 1 0.2 } appearance PBRAppearance { baseColor 0.6 0.6 0.6 } } ] }
+Solid { translation 10 0.5 0 children [ Shape { geometry Box { size 0.2 1 20 } appearance PBRAppearance { baseColor 0.6 0.6 0.6 } } ] }
+Solid { translation -10 0.5 0 children [ Shape { geometry Box { size 0.2 1 20 } appearance PBRAppearance { baseColor 0.6 0.6 0.6 } } ] }
+
+# Main SLAM Robot
+Robot {
+  supervisor TRUE
+  translation 0 0.2 0
+  controller "slam_neural_controller"
+  name "slam_robot"
+  customData "robot_id:1"
+  children [
+    Shape {
+      geometry Cylinder { height 0.3 radius 0.3 }
+      appearance PBRAppearance { baseColor 0.9 0.9 0.1 }
+    }
+    # 3D LiDAR (16-line, simulating VLP-16)
+    Lidar {
+      translation 0 0.25 0
+      name "lidar"
+      numberOfLayers 16
+      horizontalResolution 1800
+      maxRange 30.0
+      noise 0.02
+      enabled TRUE
+    }
+    # IMU
+    InertialUnit { name "imu" noise 0.01 enabled TRUE }
+    # Camera
+    Camera { name "camera" width 640 height 480 fieldOfView 1.04 enabled TRUE }
+    # Depth Camera (for neural SLAM)
+    RangeFinder { name "depth_camera" width 640 height 480 minRange 0.1 maxRange 10.0 fieldOfView 1.04 enabled TRUE }
+    # Semantic Recognition
+    Recognition { name "recognition" enabled TRUE }
+    # GPS
+    Gps { name "gps" enabled TRUE }
+    # Status Display
+    Display { name "status_display" width 320 height 240 }
+    # Wheels
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor 0.25 0 0 }
+      device [ RotationalMotor { name "left_wheel" } PositionSensor { name "left_sensor" } ]
+      endPoint Solid {
+        translation 0.25 0 0
+        children [ Shape { geometry Cylinder { height 0.05 radius 0.1 } } ]
+        boundingObject Shape { geometry Cylinder { height 0.05 radius 0.1 } }
+      }
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters { axis 0 1 0 anchor -0.25 0 0 }
+      device [ RotationalMotor { name "right_wheel" } PositionSensor { name "right_sensor" } ]
+      endPoint Solid {
+        translation -0.25 0 0
+        children [ Shape { geometry Cylinder { height 0.05 radius 0.1 } } ]
+        boundingObject Shape { geometry Cylinder { height 0.05 radius 0.1 } }
+      }
+    }
+  ]
+  boundingObject Shape { geometry Cylinder { height 0.3 radius 0.3 } }
+}

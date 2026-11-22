@@ -1,0 +1,10 @@
+Panels:
+  - Class: rviz_common/Displays
+Visualization Manager:
+  Displays:
+    - Class: rviz_default_plugins/PointCloud2
+      Topic: /lidar/point_cloud
+    - Class: rviz_default_plugins/Path
+      Topic: /slam/trajectory
+    - Class: rviz_default_plugins/Map
+      Topic: /slam/map

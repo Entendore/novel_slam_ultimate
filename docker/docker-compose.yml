@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  slam:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../results:/workspace/results
+      - ../datasets:/workspace/datasets
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: python3 analysis/metrics_dashboard.py
